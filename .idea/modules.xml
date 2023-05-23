@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/dow-jones-replica.iml" filepath="$PROJECT_DIR$/.idea/dow-jones-replica.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/dowjones-replica.iml" filepath="$PROJECT_DIR$/.idea/dowjones-replica.iml" />
     </modules>
   </component>
 </project>
