@@ -5,7 +5,7 @@ import yfinance as yf
 start_date, end_date = "1992-01-01", "2022-12-31"
 
 # downloading dow jones index dataset
-pd.DataFrame(yf.download("^DJI", start=start_date, end=end_date))\
+pd.DataFrame(yf.download("^DJI", start=start_date, end=end_date)) \
     .to_csv(".\\yahoo-datasets\\^DJI.csv", encoding='utf-8')
 
 # declaring dow jones composition (https://en.wikipedia.org/wiki/Historical_components_of_the_Dow_Jones_Industrial_Average#May_6,_1991)
