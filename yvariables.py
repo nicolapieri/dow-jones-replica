@@ -13,7 +13,10 @@ composition = ["MMM", "AXP", "AMGN", "AAPL", "BA", "CAT", "CVX", "CSCO", "KO", "
                "GS", "HD", "HON", "INTC", "IBM", "JNJ", "JPM", "MCD", "MRK", "MSFT",
                "NKE", "PG", "CRM", "TRV", "UNH", "VZ", "V", "WBA", "WMT", "DIS"]
 
-# getting Dow Jones stocks timeseries
+# creating returns dataframe
+Returns = pd.DataFrame()
+Returns['DJI_Returns'] = (DJI['Adj Close'] - DJI['Adj Close'].shift(1)) / DJI['Adj Close'].shift(1)
 for symbol in composition:
     globals()[symbol] = pd.DataFrame(yf.download(symbol, start=start_date, end=end_date))
-    globals()[symbol].to_csv(f".\\ydatasets\\{symbol}.csv", encoding='utf-8')
+    Returns[symbol + '_Returns'] = (globals()[symbol].loc[:, 'Adj Close'] - globals()[symbol].loc[:, 'Adj Close'].shift(1)) / globals()[symbol].loc[:, 'Adj Close'].shift(1)
+Returns.drop(index=Returns.index[0], axis=0, inplace=True)
