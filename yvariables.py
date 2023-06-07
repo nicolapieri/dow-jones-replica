@@ -4,7 +4,7 @@ import yfinance as yf
 # https://www.spglobal.com/spdji/en/documents/methodologies/methodology-dj-averages.pdf
 
 # setting time interval
-start_date, end_date = "1992-01-01", "2022-12-31"
+start_date, end_date = "1993-01-01", "2022-12-31"
 
 # getting Dow Jones index timeseries
 DJI = pd.DataFrame(yf.download("^DJI", start=start_date, end=end_date))
@@ -32,9 +32,9 @@ DJIA_weights = {'AAPL': 0.0284, 'AMGN': 0.0548,
 
 # creating returns dataframe
 Returns = pd.DataFrame()
-Returns['DJI_Returns'] = (DJI['Adj Close'] - DJI['Adj Close'].shift(1)) / DJI['Adj Close'].shift(1)
-for symbol in composition:
+Returns['^DJI'] = (DJI['Adj Close'] - DJI['Adj Close'].shift(1)) / DJI['Adj Close'].shift(1)
+for symbol in DJIA_components:
     globals()[symbol] = pd.DataFrame(yf.download(symbol, start=start_date, end=end_date))
-    Returns[symbol + '_Returns'] = (globals()[symbol].loc[:, 'Adj Close'] - globals()[symbol].loc[:, 'Adj Close'].shift(
+    Returns[symbol] = (globals()[symbol].loc[:, 'Adj Close'] - globals()[symbol].loc[:, 'Adj Close'].shift(
         1)) / globals()[symbol].loc[:, 'Adj Close'].shift(1)
 Returns.drop(index=Returns.index[0], axis=0, inplace=True)
