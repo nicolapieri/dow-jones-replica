@@ -30,11 +30,15 @@ DJIA_weights = {'AAPL': 0.0284, 'AMGN': 0.0548,
                 'UNH': 0.1029, 'VZ': 0.0073,
                 'WBA': 0.0079, 'WMT': 0.0294}
 
-# creating returns dataframe
+# creating closes and returns dataframes
+Closes = pd.DataFrame()
 Returns = pd.DataFrame()
-Returns['^DJI'] = (DJI['Adj Close'] - DJI['Adj Close'].shift(1)) / DJI['Adj Close'].shift(1)
 for symbol in DJIA_components:
     globals()[symbol] = pd.DataFrame(yf.download(symbol, start=start_date, end=end_date))
-    Returns[symbol] = (globals()[symbol].loc[:, 'Adj Close'] - globals()[symbol].loc[:, 'Adj Close'].shift(
-        1)) / globals()[symbol].loc[:, 'Adj Close'].shift(1)
+    Closes[symbol] = globals()[symbol].loc[:, 'Adj Close']
+    Returns[symbol] = (globals()[symbol].loc[:, 'Adj Close'] - globals()[symbol].loc[:, 'Adj Close'].shift(1)) / globals()[symbol].loc[:, 'Adj Close'].shift(1)
+Closes['avg26'] = Closes.sum(axis=1)
+Closes['^DJI'] = DJI['Adj Close']
 Returns.drop(index=Returns.index[0], axis=0, inplace=True)
+Returns['avg26'] = Returns.mean(axis=1)
+Returns['^DJI'] = (DJI['Adj Close'] - DJI['Adj Close'].shift(1)) / DJI['Adj Close'].shift(1)
