@@ -20,9 +20,9 @@ from pyswarms.utils.plotters import plot_cost_history, plot_contour, plot_surfac
 
 ds = yv.Returns.drop('avg26', axis=1)
 
-train = ds[(ds.index >= pd.to_datetime("1993-01-01")) & (ds.index <= pd.to_datetime("2002-12-31"))]
-val = ds[(ds.index >= pd.to_datetime("2003-01-01")) & (ds.index <= pd.to_datetime("2012-12-31"))]
-test = ds[(ds.index >= pd.to_datetime("2013-01-01")) & (ds.index <= pd.to_datetime("2022-12-31"))]
+train = ds[(ds.index >= pd.to_datetime("1993-01-01")) & (ds.index <= pd.to_datetime("2021-12-31"))]
+val = ds[(ds.index >= pd.to_datetime("2022-01-01")) & (ds.index <= pd.to_datetime("2022-11-30"))]
+test = ds[(ds.index >= pd.to_datetime("2022-12-01")) & (ds.index <= pd.to_datetime("2022-12-31"))]
 
 trainX = train.drop('^DJI', axis=1)
 trainY = pd.DataFrame({'^DJI': train['^DJI']})
