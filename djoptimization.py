@@ -32,39 +32,6 @@ testX = test.drop('^DJI', axis=1)
 testY = pd.DataFrame({'^DJI': test['^DJI']})
 
 
-def get_portfolio_allocation(trainX, trainY):
-    result = nnls(trainX, trainY['^DJI'])
-    print('NNLS Residual', round(result[1], 5))
-
-    leverage_factor = sum(result[0])
-    weights = result[0] / leverage_factor
-    weights = dict(zip(trainX.columns, weights))
-
-    s1 = str(round(leverage_factor, 5)) + "*("
-    for component in weights.keys():
-        s1 += str(round(weights[component], 5)) + '*' + component + " + "
-    s1 = s1[:-3] + ")"
-
-    print("\nPortfolio Allocation:")
-    allocation = pd.DataFrame(
-        {'Component': list(weights.keys()), 'Weight(%)': np.multiply(list(weights.values()), 100)}).sort_values(
-        'Weight(%)', ascending=False)
-    allocation.set_index('Component', inplace=True)
-    allocation.reset_index(inplace=True)
-    display(allocation)
-
-    print('\nPortfolio Simulated: ')
-    print(s1)
-    print("\nLeverage Factor:", leverage_factor)
-    return leverage_factor, weights
-
-
-leverage_factor, weights = get_portfolio_allocation(trainX, trainY)
-sns.heatmap(trainX.corr(), cmap="Purples", vmin=0, square=True, linewidths=.5, cbar_kws={"shrink": .5})
-plt.show()
-pass
-
-
 def evaluate(df, portfolio_col, is_test):
     index_hpr = (yv.Returns['^DJI'][-1] - yv.Returns['^DJI'][0]) / yv.Returns['^DJI'][0]
 
@@ -98,9 +65,68 @@ def evaluate(df, portfolio_col, is_test):
     pass
 
 
+def get_portfolio_allocation(trainX, trainY):
+    result = nnls(trainX, trainY['^DJI'])
+    print('NNLS Residual', round(result[1], 5))
+
+    leverage_factor = sum(result[0])
+    weights = result[0] / leverage_factor
+    weights = dict(zip(trainX.columns, weights))
+
+    s1 = str(round(leverage_factor, 5)) + "*("
+    for component in weights.keys():
+        s1 += str(round(weights[component], 5)) + '*' + component + " + "
+    s1 = s1[:-3] + ")"
+
+    print("\nPortfolio Allocation:")
+    allocation = pd.DataFrame(
+        {'Component': list(weights.keys()), 'Weight(%)': np.multiply(list(weights.values()), 100)}).sort_values(
+        'Weight(%)', ascending=False)
+    allocation.set_index('Component', inplace=True)
+    allocation.reset_index(inplace=True)
+    display(allocation)
+
+    print('\nPortfolio Simulated: ')
+    print(s1)
+    print("\nLeverage Factor:", leverage_factor)
+    return leverage_factor, weights
+
+
+# portfolio allocation with Non-Negative Least Squares (NNLS)
+leverage_factor, weights = get_portfolio_allocation(trainX, trainY)
+sns.heatmap(trainX.corr(), cmap="Purples", vmin=0, square=True, linewidths=.5, cbar_kws={"shrink": .5})
+plt.show()
 valY['NNLS'] = leverage_factor * valX.dot(list(weights.values()))
 evaluate(valY, 'NNLS', is_test=False)
-
 testY['avg26'] = yv.Returns['avg26']
 testY['NNLS'] = leverage_factor * testX.dot(list(weights.values()))
 evaluate(testY, 'NNLS', is_test=True)
+pass
+
+# portfolio allocation with Partial Correlation (PCRR)
+correls = pd.DataFrame({'Correlation': train.corr()['^DJI'],
+                        'Partial Correlation': train.pcorr()['^DJI']})
+print(correls)
+weights = correls['Partial Correlation'].apply(lambda x: max(0, x))[:-1]
+leverage_factor = sum(weights)
+weights = (weights / leverage_factor).to_dict()
+s1 = str(round(leverage_factor, 5))+"("
+for component, weight in weights.items():
+    s1 += str(round(weight, 5))+'*'+component+" + "
+s1 = s1[:-3]+")"
+print("\nPortfolio Allocation:")
+allocation = pd.DataFrame({'Component': list(weights.keys()),
+                           'Weight(%)': np.multiply(list(weights.values()), 100)}).sort_values('Weight(%)', ascending=False)
+allocation.set_index('Component', inplace=True)
+allocation.plot.pie(y='Weight(%)', legend=None)
+allocation.reset_index(inplace=True)
+display(allocation)
+print('\nPortfolio Simulated Returns = ')
+print(s1)
+print("\nLeverage Factor:", leverage_factor)
+valY['Partial Correlation Returns'] = leverage_factor*valX.dot(list(weights.values()))
+evaluate(valY, 'Partial Correlation Returns', is_test=False)
+testY['Benchmark Close'] = yv.Returns['avg26']
+testY['Partial Correlation Returns'] = leverage_factor*testX.dot(list(weights.values()))
+evaluate(testY, 'Partial Correlation Returns', is_test=True)
+pass
