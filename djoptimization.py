@@ -1,4 +1,4 @@
-import yvariables as yv
+import staging as stage
 import math
 import numpy as np
 import pandas as pd
@@ -17,52 +17,6 @@ from pyswarms.utils.search.grid_search import GridSearch
 from pyswarms.utils.search.random_search import RandomSearch
 from pyswarms.single.global_best import GlobalBestPSO
 from pyswarms.utils.plotters import plot_cost_history, plot_contour, plot_surface
-
-ds = yv.Returns.drop('avg26', axis=1)
-
-train = ds[(ds.index >= pd.to_datetime("1993-01-01")) & (ds.index <= pd.to_datetime("2021-12-31"))]
-val = ds[(ds.index >= pd.to_datetime("2022-01-01")) & (ds.index <= pd.to_datetime("2022-11-30"))]
-test = ds[(ds.index >= pd.to_datetime("2022-12-01")) & (ds.index <= pd.to_datetime("2022-12-31"))]
-
-trainX = train.drop('^DJI', axis=1)
-trainY = pd.DataFrame({'^DJI': train['^DJI']})
-valX = val.drop('^DJI', axis=1)
-valY = pd.DataFrame({'^DJI': val['^DJI']})
-testX = test.drop('^DJI', axis=1)
-testY = pd.DataFrame({'^DJI': test['^DJI']})
-
-
-def evaluate(df, portfolio_col, is_test):
-    index_hpr = (yv.Returns['^DJI'][-1] - yv.Returns['^DJI'][0]) / yv.Returns['^DJI'][0]
-
-    if is_test:
-        benchmark_hpr = (yv.Returns['avg26'][-1] - yv.Returns['avg26'][0]) / yv.Returns['avg26'][0]
-        benchmark_active_return = benchmark_hpr - index_hpr
-        benchmark_tracking_error = np.std(yv.Returns['avg26'] - yv.Returns['^DJI'])
-        info_ratio = benchmark_active_return / benchmark_tracking_error
-        print("\nBenchmark (avg26)")
-        print("*" * 30)
-        print("Active Return:", round(benchmark_active_return, 5))
-        print("Tracking Error:", round(benchmark_tracking_error * 10000), " bps")
-        print("Information Ratio:", round(info_ratio, 5))
-        print("Returns RMSE:", mean_squared_error(yv.Returns['avg26'], yv.Returns['^DJI'], squared=False))
-
-    if portfolio_col:
-        portfolio_hpr = (df[portfolio_col][-1] - df[portfolio_col][0]) / df[portfolio_col][0]
-        portfolio_active_return = portfolio_hpr - index_hpr
-        portfolio_tracking_error = np.std(df[portfolio_col] - yv.Returns['^DJI'])
-        info_ratio = portfolio_active_return / portfolio_tracking_error
-        print("\nTrial Portfolio")
-        print("*" * 30)
-        print("Active Return:", round(portfolio_active_return, 5))
-        print("Tracking Error:", round(portfolio_tracking_error * 10000), "bps")
-        print("Information Ratio:", round(info_ratio, 5))
-        print("Returns RMSE:", mean_squared_error(df[portfolio_col], df['^DJI'], squared=False))
-
-    df.plot()
-    plt.title("Non-negative Least Squares (NNLS) Optimization")
-    plt.show()
-    pass
 
 
 def get_portfolio_allocation(trainX, trainY):
@@ -93,19 +47,19 @@ def get_portfolio_allocation(trainX, trainY):
 
 
 # portfolio allocation with Non-Negative Least Squares (NNLS)
-leverage_factor, weights = get_portfolio_allocation(trainX, trainY)
-sns.heatmap(trainX.corr(), cmap="Purples", vmin=0, square=True, linewidths=.5, cbar_kws={"shrink": .5})
+leverage_factor, weights = get_portfolio_allocation(stage.trainX, stage.trainY)
+sns.heatmap(stage.trainX.corr(), cmap="Purples", vmin=0, square=True, linewidths=.5, cbar_kws={"shrink": .5})
 plt.show()
-valY['NNLS'] = leverage_factor * valX.dot(list(weights.values()))
-evaluate(valY, 'NNLS', is_test=False)
-testY['avg26'] = yv.Returns['avg26']
-testY['NNLS'] = leverage_factor * testX.dot(list(weights.values()))
-evaluate(testY, 'NNLS', is_test=True)
+stage.valY['NNLS'] = leverage_factor * stage.valX.dot(list(weights.values()))
+stage.evaluate(stage.valY, 'NNLS', is_test=False)
+stage.testY['avg26'] = stage.Returns['avg26']
+stage.testY['NNLS'] = leverage_factor * stage.testX.dot(list(weights.values()))
+stage.evaluate(stage.testY, 'NNLS', is_test=True)
 pass
 
 # portfolio allocation with Partial Correlation (PCRR)
-correls = pd.DataFrame({'Correlation': train.corr()['^DJI'],
-                        'Partial Correlation': train.pcorr()['^DJI']})
+correls = pd.DataFrame({'Correlation': stage.train.corr()['^DJI'],
+                        'Partial Correlation': stage.train.pcorr()['^DJI']})
 print(correls)
 weights = correls['Partial Correlation'].apply(lambda x: max(0, x))[:-1]
 leverage_factor = sum(weights)
@@ -124,9 +78,9 @@ display(allocation)
 print('\nPortfolio Simulated Returns = ')
 print(s1)
 print("\nLeverage Factor:", leverage_factor)
-valY['Partial Correlation Returns'] = leverage_factor*valX.dot(list(weights.values()))
-evaluate(valY, 'Partial Correlation Returns', is_test=False)
-testY['Benchmark Close'] = yv.Returns['avg26']
-testY['Partial Correlation Returns'] = leverage_factor*testX.dot(list(weights.values()))
-evaluate(testY, 'Partial Correlation Returns', is_test=True)
+stage.valY['Partial Correlation Returns'] = leverage_factor*stage.valX.dot(list(weights.values()))
+stage.evaluate(stage.valY, 'Partial Correlation Returns', is_test=False)
+stage.testY['Benchmark Close'] = stage.Returns['avg26']
+stage.testY['Partial Correlation Returns'] = leverage_factor*stage.testX.dot(list(weights.values()))
+stage.evaluate(stage.testY, 'Partial Correlation Returns', is_test=True)
 pass

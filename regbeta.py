@@ -1,7 +1,7 @@
 import numpy as np
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
-import yvariables as yv
+import staging as yv
 
 
 def beta_regression(symbol):

@@ -1,5 +1,5 @@
 import numpy as np
-import yvariables as yv
+import staging as yv
 
 # declaring Dow Jones index Beta (DJI_Beta = 0.9792634776113391 since CRM, DOW, GS and V were removed)
 DJI_Beta = 1

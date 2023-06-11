@@ -1,2 +1,3 @@
 ﻿# dow-jones-replica
 Work in progress...
+# https://www.spglobal.com/spdji/en/documents/methodologies/methodology-dj-averages.pdf
