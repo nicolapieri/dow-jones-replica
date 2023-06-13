@@ -1,6 +1,7 @@
 import yfinance as yf
 import pandas as pd
 import numpy as np
+from tqdm import tqdm
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
@@ -20,7 +21,7 @@ DJI_components = ["MMM", "AXP", "AMGN", "AAPL", "BA", "CAT", "CVX", "CSCO", "KO"
 # creating closes and returns dataframes
 Closes = pd.DataFrame()
 Returns = pd.DataFrame()
-for symbol in DJI_components:
+for symbol in tqdm(DJI_components):
     yahoodata = pd.DataFrame(yf.download(symbol, start=start_date, end=end_date))
     Closes[symbol] = yahoodata.loc[:, 'Adj Close']
     Returns[symbol] = (yahoodata.loc[:, 'Adj Close'] - yahoodata.loc[:, 'Adj Close'].shift(1)) / yahoodata.loc[:, 'Adj Close'].shift(1)
