@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.decomposition import NMF
 
 # portfolio allocation with Non-Negative Matrix Factorization (NNMF)
-TRAIN = stage.Closes[(stage.Closes.index >= pd.to_datetime("1993-01-01")) & (stage.Closes.index <= pd.to_datetime("2021-12-31"))]
+TRAIN = stage.Closes[(stage.Closes.index >= stage.pd.to_datetime("1993-01-01")) & (stage.Closes.index <= pd.to_datetime("2021-12-31"))]
 TRAINX = TRAIN.drop('^DJI', axis=1)
 coeffs = NMF(n_components=1).fit(TRAINX).components_.tolist()[0]
 leverage = sum(coeffs)

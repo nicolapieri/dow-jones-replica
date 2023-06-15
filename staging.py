@@ -7,16 +7,15 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 
 # setting time interval
-start_date, end_date = "1993-01-01", "2022-12-31"
+start_date, end_date = "2020-09-01", "2023-05-31"
 
 # getting Dow Jones index timeseries
 DJI = pd.DataFrame(yf.download("^DJI", start=start_date, end=end_date))
 
 # declaring Dow Jones compositions (https://en.wikipedia.org/wiki/Historical_components_of_the_Dow_Jones_Industrial_Average)
-# excluded CRM, DOW, GS and V for missing values
 DJI_components = ["MMM", "AXP", "AMGN", "AAPL", "BA", "CAT", "CVX", "CSCO", "KO",
                   "HD", "HON", "INTC", "IBM", "JNJ", "JPM", "MCD", "MRK", "MSFT",
-                  "NKE", "PG", "TRV", "UNH", "VZ", "WBA", "WMT", "DIS"]
+                  "NKE", "PG", "TRV", "UNH", "VZ", "WBA", "WMT", "DIS", "CRM", "DOW", "GS", "V"]
 
 # creating closes and returns dataframes
 Closes = pd.DataFrame()
@@ -31,9 +30,9 @@ Returns.drop(index=Returns.index[0], axis=0, inplace=True)
 Returns['^DJI'] = (DJI['Adj Close'] - DJI['Adj Close'].shift(1)) / DJI['Adj Close'].shift(1)
 
 # train, val, test sets split
-train = Returns[(Returns.index >= pd.to_datetime("1993-01-01")) & (Returns.index <= pd.to_datetime("2021-12-31"))]
-val = Returns[(Returns.index >= pd.to_datetime("2022-01-01")) & (Returns.index <= pd.to_datetime("2022-11-30"))]
-test = Returns[(Returns.index >= pd.to_datetime("2022-12-01")) & (Returns.index <= pd.to_datetime("2022-12-31"))]
+train = Returns[(Returns.index >= pd.to_datetime("2020-09-01")) & (Returns.index <= pd.to_datetime("2022-12-31"))]
+val = Returns[(Returns.index >= pd.to_datetime("2023-01-01")) & (Returns.index <= pd.to_datetime("2023-04-30"))]
+test = Returns[(Returns.index >= pd.to_datetime("2023-05-01")) & (Returns.index <= pd.to_datetime("2023-05-31"))]
 trainX = train.drop('^DJI', axis=1)
 trainY = pd.DataFrame({'^DJI': train['^DJI']})
 valX = val.drop('^DJI', axis=1)
@@ -59,7 +58,7 @@ def evaluate(ds, optimization):
 
     print("Portfolio Evaluation")
     print("*" * 40)
-    print("Active Return:", round(portfolio_active_return, 5))
+    print("Active Return:", round(portfolio_active_return, 5), "%")
     print("Tracking Error:", round(portfolio_tracking_error * 10000), "bps")
     print("Information Ratio:", round(info_ratio, 5))
     print("Returns RMSE:", mean_squared_error(ds[optimization], ds['^DJI'], squared=False))

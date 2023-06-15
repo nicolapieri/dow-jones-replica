@@ -1,6 +1,6 @@
+import staging as stage
 import pandas as pd
 import numpy as np
-import staging as stage
 from tslearn.metrics import dtw
 
 # portfolio allocation with Dynamic Time Warping (DTW)
