@@ -2,8 +2,8 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-import statsmodels.api as sm
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 
 # setting time interval
@@ -18,36 +18,41 @@ DJI_components = ["MMM", "AXP", "AMGN", "AAPL", "BA", "CAT", "CVX", "CSCO", "KO"
                   "NKE", "PG", "TRV", "UNH", "VZ", "WBA", "WMT", "DIS", "CRM", "DOW", "GS", "V"]
 
 # creating closes and returns dataframes
-Closes = pd.DataFrame()
-Returns = pd.DataFrame()
+Closes_std = pd.DataFrame()
 for symbol in tqdm(DJI_components):
-    yahoodata = pd.DataFrame(yf.download(symbol, start=start_date, end=end_date))
-    Closes[symbol] = yahoodata.loc[:, 'Adj Close']
-    Returns[symbol] = (yahoodata.loc[:, 'Adj Close'] - yahoodata.loc[:, 'Adj Close'].shift(1)) / yahoodata.loc[:, 'Adj Close'].shift(1)
-Closes.drop(index=Returns.index[0], axis=0, inplace=True)
-Closes['^DJI'] = DJI['Adj Close']
-Returns.drop(index=Returns.index[0], axis=0, inplace=True)
-Returns['^DJI'] = (DJI['Adj Close'] - DJI['Adj Close'].shift(1)) / DJI['Adj Close'].shift(1)
+    ticker = pd.DataFrame(yf.download(symbol, start=start_date, end=end_date))
+    Closes_std[symbol] = ticker.loc[:, 'Adj Close']
+cols = list(Closes_std)
+for column in cols:
+    fitted_t = StandardScaler().fit(np.array(Closes_std[column]).reshape(len(Closes_std[column]), 1))
+    Closes_std[column] = fitted_t.transform(np.array(Closes_std[column]).reshape(len(Closes_std[column]), 1))
+fitted_C = StandardScaler().fit(np.array(DJI['Adj Close']).reshape(len(DJI['Adj Close']), 1))
+Closes_std['^DJI'] = fitted_C.transform(np.array(DJI['Adj Close']).reshape(len(DJI['Adj Close']), 1))
 
 # train, val, test sets split
-train = Returns[(Returns.index >= pd.to_datetime("2020-09-01")) & (Returns.index <= pd.to_datetime("2022-12-31"))]
-val = Returns[(Returns.index >= pd.to_datetime("2023-01-01")) & (Returns.index <= pd.to_datetime("2023-04-30"))]
-test = Returns[(Returns.index >= pd.to_datetime("2023-05-01")) & (Returns.index <= pd.to_datetime("2023-05-31"))]
+train = Closes_std[
+    (Closes_std.index >= pd.to_datetime("2020-09-01")) & (Closes_std.index <= pd.to_datetime("2022-12-31"))]
+test = Closes_std[
+    (Closes_std.index >= pd.to_datetime("2023-01-01")) & (Closes_std.index <= pd.to_datetime("2023-05-31"))]
 trainX = train.drop('^DJI', axis=1)
 trainY = pd.DataFrame({'^DJI': train['^DJI']})
-valX = val.drop('^DJI', axis=1)
-valY = pd.DataFrame({'^DJI': val['^DJI']})
 testX = test.drop('^DJI', axis=1)
 testY = pd.DataFrame({'^DJI': test['^DJI']})
-
+print('TOT:', len(Closes_std))
+print('Train:', len(train))
+print('Test:', len(test))
 
 # performance evaluation function
+opt_performances = {}
+
+
 def evaluate(ds, optimization):
-    dowjones_hpr = (Returns['^DJI'][-1] - Returns['^DJI'][0]) / Returns['^DJI'][0]
+    dowjones_hpr = (Closes_std['^DJI'][-1] - Closes_std['^DJI'][0]) / Closes_std['^DJI'][0]
     portfolio_hpr = (ds[optimization][-1] - ds[optimization][0]) / ds[optimization][0]
     portfolio_active_return = portfolio_hpr - dowjones_hpr
-    portfolio_tracking_error = np.std(ds[optimization] - Returns['^DJI'])
+    portfolio_tracking_error = np.std(ds[optimization] - Closes_std['^DJI'])
     info_ratio = portfolio_active_return / portfolio_tracking_error
+    opt_performances[optimization] = round(portfolio_tracking_error * 10000)
 
     chart = pd.DataFrame()
     chart['^DJI'] = ds['^DJI']
@@ -56,28 +61,10 @@ def evaluate(ds, optimization):
     plt.title(f"{optimization} optimization")
     plt.show()
 
-    print("Portfolio Evaluation")
+    print(f"\n{optimization} Portfolio Evaluation")
     print("*" * 40)
     print("Active Return:", round(portfolio_active_return, 5), "%")
     print("Tracking Error:", round(portfolio_tracking_error * 10000), "bps")
     print("Information Ratio:", round(info_ratio, 5))
     print("Returns RMSE:", mean_squared_error(ds[optimization], ds['^DJI'], squared=False))
-    print("\n")
-    pass
-
-
-# beta regression function
-def beta_reg(stock):
-    const = np.polyfit(Returns['^DJI'], Returns[f'{stock}'], 1)[1]
-    Beta = np.polyfit(Returns['^DJI'], Returns[f'{stock}'], 1)[0]
-    model = sm.OLS(Returns[f'{stock}'], sm.add_constant(Returns['^DJI'])).fit()
-
-    print(model.summary())
-    print(f'\n{stock} Beta:', '{:.4f}'.format(Beta))
-
-    plt.scatter(Returns['^DJI'], Returns[f'{stock}'], color='pink')
-    plt.plot(Returns['^DJI'], Beta * Returns['^DJI'] + const, color='purple')
-    plt.xlabel('^DJI')
-    plt.ylabel(f'{stock}')
-    plt.show()
     pass

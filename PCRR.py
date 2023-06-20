@@ -8,17 +8,12 @@ correls = pd.DataFrame({'Correlation': stage.train.corr()['^DJI'],
                         'Partial Correlation': stage.train.pcorr()['^DJI']})
 leverage = sum(correls['Partial Correlation'].apply(lambda x: max(0, x))[:-1])
 weights = (correls['Partial Correlation'].apply(lambda x: max(0, x))[:-1] / leverage).to_dict()
-allocation = pd.DataFrame({'Component': list(weights.keys()),
-                           'Weight(%)': np.multiply(list(weights.values()), 100)}).sort_values('Weight(%)', ascending=False)
-allocation.set_index('Component', inplace=True)
-allocation.reset_index(inplace=True)
-print("*" * 10, "Partial Correlation (PCRR) Optimization", "*" * 10)
-print("\nPortfolio Allocation:")
-print(allocation)
-print("\nLeverage Factor:", leverage, "\n")
-pass
-# portfolio optimization evaluation
-stage.valY['PCRR'] = leverage * stage.valX.dot(list(weights.values()))
-stage.evaluate(stage.valY, 'PCRR')
+allocation_PCRR = pd.DataFrame({'Component': list(weights.keys()),
+                                'PCRRweight(%)': np.multiply(list(weights.values()), 100)}).sort_values('PCRRweight(%)', ascending=False)
+allocation_PCRR.set_index('Component', inplace=True)
+allocation_PCRR.reset_index(inplace=True)
+
+# PCRR optimization evaluation
 stage.testY['PCRR'] = leverage * stage.testX.dot(list(weights.values()))
 stage.evaluate(stage.testY, 'PCRR')
+print("\nLeverage Factor:", leverage)
