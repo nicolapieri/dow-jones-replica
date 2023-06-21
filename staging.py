@@ -51,9 +51,8 @@ def evaluate(ds, optimization):
     opt_performances[optimization] = round(portfolio_tracking_error * 10000, 4)
 
     chart = pd.DataFrame()
-    chart['^DJI'] = ds['^DJI'].pct_change().dropna()
-    chart[f'{optimization}'] = ds[f'{optimization}'].pct_change().dropna()
-    chart.plot()
+    chart['Daily Deviation (bps)'] = round((ds[optimization].pct_change().dropna() - ds['^DJI'].pct_change().dropna()) * 10000, 4)
+    chart.plot(color='purple')
     plt.title(f"{optimization} optimization")
     plt.show()
 
