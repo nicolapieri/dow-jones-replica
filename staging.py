@@ -3,68 +3,65 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 
-# setting time interval
-start_date, end_date = "2020-09-01", "2023-05-31"
+# declaring Dow Jones composition (https://en.wikipedia.org/wiki/Historical_components_of_the_Dow_Jones_Industrial_Average)
+components = ["MMM", "AXP", "AMGN", "AAPL", "BA", "CAT", "CVX", "CSCO", "KO",
+              "HD", "HON", "INTC", "IBM", "JNJ", "JPM", "MCD", "MRK", "MSFT",
+              "NKE", "PG", "TRV", "UNH", "VZ", "WBA", "WMT", "DIS", "CRM", "DOW", "GS", "V"]
 
-# getting Dow Jones index timeseries
-DJI = pd.DataFrame(yf.download("^DJI", start=start_date, end=end_date))
+# creating adjusted closes dataframe
+Closes = pd.DataFrame()
+for ticker in tqdm(components):
+    stock = pd.DataFrame(yf.download(ticker, start="2020-09-01", end="2023-05-31"))
+    Closes[ticker] = stock.loc[:, 'Adj Close']
 
-# declaring Dow Jones compositions (https://en.wikipedia.org/wiki/Historical_components_of_the_Dow_Jones_Industrial_Average)
-DJI_components = ["MMM", "AXP", "AMGN", "AAPL", "BA", "CAT", "CVX", "CSCO", "KO",
-                  "HD", "HON", "INTC", "IBM", "JNJ", "JPM", "MCD", "MRK", "MSFT",
-                  "NKE", "PG", "TRV", "UNH", "VZ", "WBA", "WMT", "DIS", "CRM", "DOW", "GS", "V"]
+Closes['^DJI'] = pd.DataFrame(yf.download("^DJI", start="2020-09-01", end="2023-05-31"))['Adj Close']
 
-# creating closes and returns dataframes
-Closes_std = pd.DataFrame()
-for symbol in tqdm(DJI_components):
-    ticker = pd.DataFrame(yf.download(symbol, start=start_date, end=end_date))
-    Closes_std[symbol] = ticker.loc[:, 'Adj Close']
-cols = list(Closes_std)
-for column in cols:
-    fitted_t = StandardScaler().fit(np.array(Closes_std[column]).reshape(len(Closes_std[column]), 1))
-    Closes_std[column] = fitted_t.transform(np.array(Closes_std[column]).reshape(len(Closes_std[column]), 1))
-fitted_C = StandardScaler().fit(np.array(DJI['Adj Close']).reshape(len(DJI['Adj Close']), 1))
-Closes_std['^DJI'] = fitted_C.transform(np.array(DJI['Adj Close']).reshape(len(DJI['Adj Close']), 1))
+# train-test sets split
+train_start, train_end = "2020-09-01", "2022-12-31"
+test_start, test_end = "2023-01-01", "2023-05-31"
 
-# train, val, test sets split
-train = Closes_std[
-    (Closes_std.index >= pd.to_datetime("2020-09-01")) & (Closes_std.index <= pd.to_datetime("2022-12-31"))]
-test = Closes_std[
-    (Closes_std.index >= pd.to_datetime("2023-01-01")) & (Closes_std.index <= pd.to_datetime("2023-05-31"))]
-trainX = train.drop('^DJI', axis=1)
-trainY = pd.DataFrame({'^DJI': train['^DJI']})
-testX = test.drop('^DJI', axis=1)
-testY = pd.DataFrame({'^DJI': test['^DJI']})
-print('TOT:', len(Closes_std))
-print('Train:', len(train))
-print('Test:', len(test))
+trainX = Closes[(Closes.index >= pd.to_datetime(train_start)) & (Closes.index <= pd.to_datetime(train_end))].drop(
+    '^DJI', axis=1)
+trainY = pd.DataFrame({'^DJI': Closes[
+    (Closes.index >= pd.to_datetime(train_start)) & (Closes.index <= pd.to_datetime(train_end))]['^DJI']})
+testX = Closes[(Closes.index >= pd.to_datetime(test_start)) & (Closes.index <= pd.to_datetime(test_end))].drop('^DJI',
+                                                                                                               axis=1)
+testY = pd.DataFrame(
+    {'^DJI': Closes[(Closes.index >= pd.to_datetime(test_start)) & (Closes.index <= pd.to_datetime(test_end))]['^DJI']})
+
+print('\n')
+print(f'Considering the time period from {train_start} to {test_end},', f'{len(Closes)} observations')
+print(f'Training period from {train_start} to {train_end},', f'{len(trainX)} observations')
+print(f'Testing period from {test_start} to {test_end},', f'{len(testX)} observations')
 
 # performance evaluation function
 opt_performances = {}
 
 
 def evaluate(ds, optimization):
-    dowjones_hpr = (Closes_std['^DJI'][-1] - Closes_std['^DJI'][0]) / Closes_std['^DJI'][0]
     portfolio_hpr = (ds[optimization][-1] - ds[optimization][0]) / ds[optimization][0]
-    portfolio_active_return = portfolio_hpr - dowjones_hpr
-    portfolio_tracking_error = np.std(ds[optimization] - Closes_std['^DJI'])
+    dowjones_hpr = (ds['^DJI'][-1] - ds['^DJI'][0]) / ds['^DJI'][0]
+    portfolio_tracking_error = np.std(ds[optimization].pct_change().dropna() - ds['^DJI'].pct_change().dropna())
+    rooted_mse = mean_squared_error(ds[optimization].pct_change().dropna(), ds['^DJI'].pct_change().dropna(),
+                                    squared=False)
+    portfolio_active_return = (portfolio_hpr - dowjones_hpr)
     info_ratio = portfolio_active_return / portfolio_tracking_error
-    opt_performances[optimization] = round(portfolio_tracking_error * 10000)
+    opt_performances[optimization] = round(portfolio_tracking_error * 10000, 4)
 
     chart = pd.DataFrame()
-    chart['^DJI'] = ds['^DJI']
-    chart[f'{optimization}'] = ds[f'{optimization}']
+    chart['^DJI'] = ds['^DJI'].pct_change().dropna()
+    chart[f'{optimization}'] = ds[f'{optimization}'].pct_change().dropna()
     chart.plot()
     plt.title(f"{optimization} optimization")
     plt.show()
 
-    print(f"\n{optimization} Portfolio Evaluation")
-    print("*" * 40)
-    print("Active Return:", round(portfolio_active_return, 5), "%")
-    print("Tracking Error:", round(portfolio_tracking_error * 10000), "bps")
-    print("Information Ratio:", round(info_ratio, 5))
-    print("Returns RMSE:", mean_squared_error(ds[optimization], ds['^DJI'], squared=False))
+    print(f"\nPortfolio Evaluation - {optimization}")
+    print("-" * 50)
+    print(f"Average Tracking Error: {round(portfolio_tracking_error * 10000, 4)} bps")
+    print(f"Information Ratio: {round(info_ratio, 4)}")
+    print(f"Rooted MSE from ^DJI: {round(rooted_mse * 100, 4)} %")
+    print(f"Portfolio Active Return (testing period): {round(portfolio_active_return * 100, 4)} %")
+    print("-" * 50)
     pass
