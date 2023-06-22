@@ -9,7 +9,8 @@ correls_PCRR = pd.DataFrame({'corr': pd.merge(stage.trainX, stage.trainY, on='Da
 leverage_PCRR = sum(correls_PCRR['pcorr'].drop('^DJI'))
 weights_PCRR = (correls_PCRR['pcorr'].drop('^DJI') / leverage_PCRR).to_dict()
 allocation_PCRR = pd.DataFrame({'Component': list(weights_PCRR.keys()),
-                                'PCRRweight(%)': np.multiply(list(weights_PCRR.values()), 100)}).sort_values('PCRRweight(%)', ascending=False)
+                                'PCRRweight(%)': np.multiply(list(weights_PCRR.values()), 100)}).sort_values(
+    'PCRRweight(%)', ascending=False)
 allocation_PCRR.set_index('Component', inplace=True)
 allocation_PCRR.reset_index(inplace=True)
 

@@ -8,14 +8,17 @@ import NNMF
 import PSO
 import pandas as pd
 
-# creating final results dataframe
-results = pd.merge(pd.merge(pd.merge(pd.merge(pd.merge(recon.reconstruction,
-                                                       NNLS.allocation_NNLS, on='Component'),
-                                              PCRR.allocation_PCRR, on='Component'),
-                                     DTW.allocation_DTW, on='Component'),
-                            NNMF.allocation_NNMF, on='Component'),
-                   PSO.allocation_PSO, on='Component')
-# results['AVGweight(%)'] = results.mean(axis=1)
+# creating final results dataframes
+results_bystocks = pd.merge(pd.merge(pd.merge(pd.merge(pd.merge(recon.reconstruction,
+                                                                NNLS.allocation_NNLS, on='Component'),
+                                                       PCRR.allocation_PCRR, on='Component'),
+                                              DTW.allocation_DTW, on='Component'),
+                                     NNMF.allocation_NNMF, on='Component'),
+                            PSO.allocation_PSO, on='Component')
+
+results_byportfolio = pd.merge(pd.DataFrame(stage.opt_terrors.items(), columns=['Opt_Method', 'Std_TErrors']),
+                               pd.DataFrame(stage.opt_betas.items(), columns=['Opt_Method', 'Beta_portfolio']),
+                               on='Opt_Method').sort_values('Std_TErrors', ascending=True)
 
 # showing results
 graph = pd.DataFrame()
@@ -28,7 +31,8 @@ graph['PSO'] = round((stage.testY['PSO'].pct_change().dropna() - stage.testY['^D
 graph.plot()
 plt.title(f"Daily Deviation Summary (bps)")
 plt.show()
+
 print("-" * 100)
-print('\n Average Tracking Errors:', stage.opt_performances)
+print(results_byportfolio)
 print("-" * 100)
-print(results)
+print(results_bystocks)
