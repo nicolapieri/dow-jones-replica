@@ -31,3 +31,5 @@ I will base the replica goodness evaluation on 4 KPIs, but not all of them do ha
 *   **Beta**. It is a measure of the volatility or systematic risk (not diversifiable) of a stock or portfolio compared to the reference benchmark. It is given by dividing the product of the covariance of the stock or portfolio returns and the benchmark returns by the variance of the benchmark returns over a specified period. Values higher than 1 indicate that the stock or portfolio is more volatile than the benchmark. Values between 0 and 1 indicate that the stock or portfolio is less volatile than the benchmark. Values lower than 0 indicate that the stock or the portfolio tends to move in the opposite direction with respect to the benchmark. The Beta is at the core of the modern finance theory, the [Capital Asset Pricing Model](https://en.wikipedia.org/wiki/Capital_asset_pricing_model).
 
 ![img.png](img.png)
+
+test
