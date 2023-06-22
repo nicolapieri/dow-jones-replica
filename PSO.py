@@ -33,7 +33,7 @@ optimizer = GlobalBestPSO(n_particles=1000,
                           bounds=(len(stage.trainX.columns) * [0], len(stage.trainX.columns) * [1]))
 cost, pos = optimizer.optimize(swarm, iters=100)
 
-# portfolio allocation with Particle Swarm (PSW)
+# portfolio allocation with Particle Swarm (PSO)
 leverage_PSO = sum(pos)
 weights_PSO = dict(zip(list(stage.trainX.columns), list(pos / leverage_PSO)))
 allocation_PSO = pd.DataFrame({'Component': stage.trainX.columns,
