@@ -20,12 +20,17 @@ Closes['^DJI'] = pd.DataFrame(yf.download("^DJI", start="2020-09-01", end="2023-
 
 # train-test sets split
 train_start, train_end = "2020-09-01", "2022-12-31"
-test_start, test_end = "2023-01-01", "2023-05-31"
+val_start, val_end = "2023-01-01", "2023-04-30"
+test_start, test_end = "2023-05-01", "2023-05-31"
 
 trainX = Closes[(Closes.index >= pd.to_datetime(train_start)) & (Closes.index <= pd.to_datetime(train_end))].drop(
     '^DJI', axis=1)
 trainY = pd.DataFrame({'^DJI': Closes[
     (Closes.index >= pd.to_datetime(train_start)) & (Closes.index <= pd.to_datetime(train_end))]['^DJI']})
+valX = Closes[(Closes.index >= pd.to_datetime(val_start)) & (Closes.index <= pd.to_datetime(val_end))].drop('^DJI',
+                                                                                                            axis=1)
+valY = pd.DataFrame(
+    {'^DJI': Closes[(Closes.index >= pd.to_datetime(val_start)) & (Closes.index <= pd.to_datetime(val_end))]['^DJI']})
 testX = Closes[(Closes.index >= pd.to_datetime(test_start)) & (Closes.index <= pd.to_datetime(test_end))].drop('^DJI',
                                                                                                                axis=1)
 testY = pd.DataFrame(
@@ -48,11 +53,15 @@ def evaluate(ds, optimization):
     opt_betas[
         optimization] = f'{float(LinearRegression().fit(np.array(ds[optimization]).reshape((-1, 1)), gspcY).coef_):.20f}'
 
+    plt.style.use('Solarize_Light2')
     chart = pd.DataFrame()
-    chart['Daily Deviation (bps)'] = round(
+    chart['Portfolio Tracking Error'] = round(
         (ds[optimization].pct_change().dropna() - ds['^DJI'].pct_change().dropna()) * 10000, 4)
     chart.plot(color='purple')
     plt.title(f"{optimization} optimization")
+    plt.hlines(y=20, xmin=test_start, xmax=test_end, colors='indigo', linestyle='dashed')
+    plt.hlines(y=-20, xmin=test_start, xmax=test_end, colors='indigo', linestyle='dashed')
+    plt.ylabel('Basis Points (bps)')
     plt.show()
 
     print(f"\nPortfolio Evaluation - {optimization}")
@@ -60,7 +69,7 @@ def evaluate(ds, optimization):
     print(f"Standard Tracking Error: {round(portfolio_tracking_error * 10000, 4)} bps")
     print(f"Information Ratio: {round(info_ratio, 4)}")
     print(f"Portfolio Active Return (testing period): {round(portfolio_active_return * 100, 4)} %")
-    print(f"{optimization}-optimized portfolio Beta over S&P500: {opt_betas[optimization]}")
+    print(f"Portfolio Beta (over S&P500): {opt_betas[optimization]}")
     print("-" * 50)
     pass
 
@@ -68,4 +77,5 @@ def evaluate(ds, optimization):
 print('\n')
 print(f'Considering the time period from {train_start} to {test_end},', f'{len(Closes)} observations')
 print(f'Training period from {train_start} to {train_end},', f'{len(trainX)} observations')
+print(f'Validation period from {val_start} to {val_end},', f'{len(valX)} observations')
 print(f'Testing period from {test_start} to {test_end},', f'{len(testX)} observations')

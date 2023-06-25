@@ -3,19 +3,28 @@ import pandas as pd
 import numpy as np
 from scipy.optimize import nnls
 
-# portfolio allocation with Non-Negative Least Squares (NNLS)
-residual_NNLS = nnls(stage.trainX, stage.trainY['^DJI'])
-leverage_NNLS = sum(residual_NNLS[0])
-weights_NNLS = dict(zip(stage.trainX.columns, residual_NNLS[0] / leverage_NNLS))
-allocation_NNLS = pd.DataFrame({'Component': list(weights_NNLS.keys()),
-                                'NNLSweight(%)': np.multiply(list(weights_NNLS.values()), 100)}).sort_values('NNLSweight(%)', ascending=False)
-allocation_NNLS.set_index('Component', inplace=True)
-allocation_NNLS.reset_index(inplace=True)
+# training with Non-Negative Least Squares (NNLS)
+NNLStrain_residual = nnls(stage.trainX, stage.trainY['^DJI'])
+NNLStrain_leverage = sum(NNLStrain_residual[0])
+NNLStrain_weights = dict(zip(stage.trainX.columns, NNLStrain_residual[0] / NNLStrain_leverage))
+NNLStrain_allocation = pd.DataFrame({'Component': list(NNLStrain_weights.keys()),
+                                     'NNLS-30wg(%)': np.multiply(list(NNLStrain_weights.values()), 100)}).sort_values('NNLS-30wg(%)', ascending=False)
+NNLStrain_allocation.set_index('Component', inplace=True)
+NNLStrain_allocation.reset_index(inplace=True)
 
-# NNLS optimization evaluation
-stage.testY['NNLS'] = leverage_NNLS * stage.testX.dot(list(weights_NNLS.values()))
+# validation with top 10 weighted stocks
+NNLSval_residual = nnls(stage.valX[NNLStrain_allocation['Component'][0:10]], stage.valY['^DJI'])
+NNLSval_leverage = sum(NNLSval_residual[0])
+NNLSval_weights = dict(zip(stage.valX[NNLStrain_allocation['Component'][0:10]].columns, NNLSval_residual[0] / NNLSval_leverage))
+NNLSval_allocation = pd.DataFrame({'Component': list(NNLSval_weights.keys()),
+                                   'NNLS-10wg(%)': np.multiply(list(NNLSval_weights.values()), 100)}).sort_values('NNLS-10wg(%)', ascending=False)
+NNLSval_allocation.set_index('Component', inplace=True)
+NNLSval_allocation.reset_index(inplace=True)
+
+# testing NNLS portfolio optimization
+stage.testY['NNLS'] = NNLSval_leverage * stage.testX[NNLSval_allocation['Component'][0:10]].dot(list(NNLSval_weights.values()))
 stage.evaluate(stage.testY, 'NNLS')
 
-print(allocation_NNLS)
+print(NNLSval_allocation)
 print("-" * 50)
-print("Leverage Factor:", leverage_NNLS)
+print("Leverage Factor:", NNLSval_leverage)

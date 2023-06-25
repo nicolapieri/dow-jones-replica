@@ -11,8 +11,8 @@ betas = {}
 for ticker in stage.components:
     betas[ticker] = float(LinearRegression().fit(np.array(stage.testX.pct_change().dropna()[ticker]).reshape((-1, 1)),
                                                  np.array(stage.testY.pct_change().dropna()['^DJI'])).coef_)
-reconstruction = pd.DataFrame(betas.items(), columns=['Component', 'Beta_stock']).sort_values('Beta_stock',
-                                                                                              ascending=False)
+reconstruction = pd.DataFrame(betas.items(), columns=['Component', 'Beta_(over_^DJI)']).sort_values('Beta_(over_^DJI)',
+                                                                                                    ascending=False)
 reconstruction.set_index('Component', inplace=True)
 reconstruction.reset_index(inplace=True)
 
