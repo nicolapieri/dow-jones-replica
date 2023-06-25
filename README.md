@@ -22,7 +22,7 @@ Lastly, I would make you notice that I am using adjusted closing prices and not 
 # Evaluation KPIs
 I will base the replica goodness evaluation on 4 KPIs, but not all of them do have the same relevance. Here I explain their interpretation.
 
-*   **Standard Tracking Error**. It indicates the absolute difference in actual performance between the portfolio replica and the ^DJI index. It is given by the standard deviation of the differences between the returns of the portfolio and the ^DJI. Since our goal is to replicate an index and not beat the market (god forbid), I am just interested in having low Standard Tracking Errors in absolute terms.
+*   **Standard Tracking Error**. It indicates the absolute difference in actual performance between the portfolio replica and the ^DJI index. It is given by the standard deviation of the differences between the returns of the portfolio and the ^DJI. Since my goal is to replicate an index and not beat the market (god forbid), I am just interested in having low Standard Tracking Errors in absolute terms.
 
 *   **Information Ratio**. It identifies how much the portfolio replica has exceeded the ^DJI index in terms of returns. It is given by standardizing (thanks to the tracking error) the difference in performances between the portfolio and the ^DJI. Higher information ratios indicate a desired level of portfolio strategy consistency, but without a related measure of risk, it is a really naive indicator.
 
