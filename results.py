@@ -1,6 +1,5 @@
 import staging as stage
 import matplotlib.pyplot as plt
-import recon
 import NNLS
 import PCRR
 import DTW
@@ -9,58 +8,34 @@ import PSO
 import pandas as pd
 
 # creating final results dataframes
-results_bystocks = pd.merge(
-    pd.merge(
-        pd.merge(
-            pd.merge(
-                pd.merge(
-                    pd.merge(
-                        pd.merge(
-                            pd.merge(
-                                pd.merge(
-                                    pd.merge(NNLS.NNLStrain_allocation, NNLS.NNLSval_allocation,
-                                             on='Component', how='outer'),
-                                    PCRR.PCRRtrain_allocation,
-                                    on='Component', how='outer'),
-                                PCRR.PCRRval_allocation,
-                                on='Component', how='outer'),
-                            DTW.DTWtrain_allocation,
-                            on='Component', how='outer'),
-                        DTW.DTWval_allocation,
-                        on='Component', how='outer'),
-                    NNMF.NNMFtrain_allocation,
-                    on='Component', how='outer'),
-                NNMF.NNMFval_allocation,
-                on='Component', how='outer'),
-            PSO.PSOtrain_allocation,
-            on='Component', how='outer'),
-        PSO.PSOval_allocation,
-        on='Component', how='outer'),
-    recon.reconstruction,
-    on='Component', how='outer')
+Opt_methods = pd.DataFrame(stage.opt_terrors.items(), columns=['Opt_Method', 'Std_Tracking_Errors']).sort_values(
+    'Std_Tracking_Errors', ascending=True)
 
-results_byportfolio = pd.merge(pd.DataFrame(stage.opt_terrors.items(), columns=['Opt_Method', 'Std_Tracking_Errors']),
-                               pd.DataFrame(stage.opt_betas.items(), columns=['Opt_Method', 'Portfolio_Beta']),
-                               on='Opt_Method').sort_values('Std_Tracking_Errors', ascending=True)
+Opt_portfolios = pd.merge(pd.merge(pd.merge(pd.merge(NNLS.NNLS_allocation, PCRR.PCRR_allocation, on='Component', how='outer'),
+                                            DTW.DTW_allocation, on='Component', how='outer'),
+                                   NNMF.NNMF_allocation, on='Component', how='outer'),
+                          PSO.PSO_allocation, on='Component', how='outer').fillna(0)
 
 # showing results
 plt.style.use('default')
-graph = pd.DataFrame()
-graph['recon'] = round((stage.testY['recon'].pct_change().dropna() - stage.testY['^DJI'].pct_change().dropna()) * 10000,
-                       4)
-graph['NNLS'] = round((stage.testY['NNLS'].pct_change().dropna() - stage.testY['^DJI'].pct_change().dropna()) * 10000,
-                      4)
-graph['PCRR'] = round((stage.testY['PCRR'].pct_change().dropna() - stage.testY['^DJI'].pct_change().dropna()) * 10000,
-                      4)
-graph['DTW'] = round((stage.testY['DTW'].pct_change().dropna() - stage.testY['^DJI'].pct_change().dropna()) * 10000, 4)
-graph['NNMF'] = round((stage.testY['NNMF'].pct_change().dropna() - stage.testY['^DJI'].pct_change().dropna()) * 10000,
-                      4)
-graph['PSO'] = round((stage.testY['PSO'].pct_change().dropna() - stage.testY['^DJI'].pct_change().dropna()) * 10000, 4)
-graph.plot()
-plt.title(f"Tracking Errors Summary (bps)")
+
+TErrors = pd.DataFrame()
+TErrors['NNLS'] = round((stage.Opt['NNLS'].pct_change().dropna() - stage.Opt['^DJI'].pct_change().dropna()) * 10000, 4)
+TErrors['PCRR'] = round((stage.Opt['PCRR'].pct_change().dropna() - stage.Opt['^DJI'].pct_change().dropna()) * 10000, 4)
+TErrors['DTW'] = round((stage.Opt['DTW'].pct_change().dropna() - stage.Opt['^DJI'].pct_change().dropna()) * 10000, 4)
+TErrors['NNMF'] = round((stage.Opt['NNMF'].pct_change().dropna() - stage.Opt['^DJI'].pct_change().dropna()) * 10000, 4)
+TErrors['PSO'] = round((stage.Opt['PSO'].pct_change().dropna() - stage.Opt['^DJI'].pct_change().dropna()) * 10000, 4)
+TErrors[(TErrors.index >= pd.to_datetime('2023-05-01')) & (TErrors.index <= pd.to_datetime('2023-05-31'))].plot()
+TErrors['Mean'] = TErrors.mean(axis=1)
+TErrors['Replica'] = (abs(TErrors.mean(axis=1)) < 5).astype(bool)
+
+plt.title(f"Portfolios Tracking Errors")
+plt.ylabel('Basis Points (bps)')
+plt.hlines(y=5, xmin="2023-05-01", xmax="2023-05-31", colors='indigo', linestyle='dashed')
+plt.hlines(y=-5, xmin="2023-05-01", xmax="2023-05-31", colors='indigo', linestyle='dashed')
 plt.show()
 
 print("-" * 100)
-print(results_byportfolio)
+print(Opt_methods)
 print("-" * 100)
-print(results_bystocks)
+print(Opt_portfolios)
