@@ -31,16 +31,16 @@ I will base the replica goodness evaluation on the following KPIs, but not all o
 ![img.png](img.png)
 
 # Results & learning a model
-Quick premise to the results: even if some optimization methods had better tracking errors than others, I am assuming that it is desirable to combine them all in order to have a robust strategy. Apart from the picture, I chose to represent the results with three different tables.
+Quick premise to the results: even if some optimization methods had better tracking errors than others, **I am assuming that it is desirable to combine them all in order to have a robust strategy**. Apart from the picture, I chose to represent the results with three different tables.
 
-* The first is also the simplest; it is just a list of the optimization methods, sorted by their own standard tracking error. As you can see, being the most demanding method of the five (the PSO) does not grant the best performance.
+* The first is also the simplest; it is just a list of the optimization methods, sorted by their own standard tracking error. As you can see, **being the most demanding method of the five (the PSO) does not grant the best performance**.
 
-* The second table represents a summary of the portfolios broken down by single stocks. Negative-weighted stocks are those that appear to be negatively correlated with the index and therefore should be bought short. Indeed, all the weights in a portfolio always sum up to 100%.
+* The second table represents a summary of the portfolios broken down by single stocks. **Negative-weighted stocks are those that appear to be negatively correlated with the index and therefore should be bought short**. Indeed, all the weights in a portfolio always sum up to 100%.
 
-* The last table shows the tracking error time series by optimization methods. I decided to set up an interval of +/- 5 bps, within which the replica can be considered correct, to evaluate the mean of the tracking errors day by day. I have also created a boolean variable to express this latter information.
+* The last table shows the tracking error time series by optimization methods. **I decided to set up an interval of +/- 5 bps, within which the replica can be considered correct, to evaluate the mean of the tracking errors day by day**. I have also created a boolean variable to express this latter information.
 
 Starting from this basis, I trained two models (the ML model and the DL model) to generate forecasts of the boolean variable, using the tracking errors of only 4 of the 5 portfolio optimization methods as predictors.
 
-I intentionally excluded PSO because it is the most expensive in terms of time and computational resources. The ultimate goal is to compare models that can generate predictions based on the tracking errors of four optimization methods without the need for input from the fifth method (the PSO).
+**I intentionally excluded PSO because it is the most expensive in terms of time and computational resources**. The ultimate goal is to compare models that can generate predictions based on the tracking errors of four optimization methods without the need for input from the fifth method (the PSO).
 
-If the models prove reliable, their predictions on a completely new dataset could be interpreted as if they were generated using information from PSO as well. Even if, in reality, PSO was not actually applied to the new data, which would lead to a significant saving of resources.
+**If the models prove reliable, their predictions on a completely new dataset could be interpreted as if they were generated using information from PSO as well**. Even if, in reality, PSO was not actually applied to the new data, which would lead to a significant saving of resources.
