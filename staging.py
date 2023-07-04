@@ -11,8 +11,8 @@ components = ["MMM", "AXP", "AMGN", "AAPL", "BA", "CAT", "CVX", "CSCO", "KO",
 # creating adjusted closes dataframe
 X = pd.DataFrame()
 for ticker in components:
-    stock = pd.DataFrame(yf.download(ticker, start="2020-09-01", end="2023-05-31"))
-    X[ticker] = stock.loc[:, 'Adj Close']
+    globals()[ticker] = pd.DataFrame(yf.download(ticker, start="2020-09-01", end="2023-05-31"))
+    X[ticker] = globals()[ticker].loc[:, 'Adj Close']
 
 Y = pd.DataFrame()
 Y['^DJI'] = pd.DataFrame(yf.download("^DJI", start="2020-09-01", end="2023-05-31"))['Adj Close']

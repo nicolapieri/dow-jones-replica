@@ -27,7 +27,7 @@ TErrors['NNMF'] = round((stage.Opt['NNMF'].pct_change().dropna() - stage.Opt['^D
 TErrors['PSO'] = round((stage.Opt['PSO'].pct_change().dropna() - stage.Opt['^DJI'].pct_change().dropna()) * 10000, 4)
 TErrors[(TErrors.index >= pd.to_datetime('2023-05-01')) & (TErrors.index <= pd.to_datetime('2023-05-31'))].plot()
 TErrors['Mean'] = TErrors.mean(axis=1)
-TErrors['Replica'] = (abs(TErrors.mean(axis=1)) < 5).astype(bool)
+TErrors['Replica'] = (abs(TErrors['Mean']) < 5).astype(bool)
 
 plt.title(f"Portfolios Tracking Errors")
 plt.ylabel('Basis Points (bps)')
