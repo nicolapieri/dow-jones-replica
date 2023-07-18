@@ -44,4 +44,3 @@ Starting from this basis, I trained two models (the ML model and the DL model) t
 **I intentionally excluded PSO because it is the most expensive in terms of time and computational resources**. The ultimate goal is to compare models that can generate predictions based on the tracking errors of four optimization methods without the need for input from the fifth method (the PSO).
 
 **If the models prove reliable, their predictions on a completely new dataset could be interpreted as if they were generated using information from PSO as well**. Even if, in reality, PSO was not actually applied to the new data, which would lead to a significant saving of resources.
-prova
