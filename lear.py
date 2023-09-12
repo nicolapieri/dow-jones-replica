@@ -1,15 +1,14 @@
-import time
-import pandas as pd
-import results as res
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import precision_score
-from tensorflow.keras.models import Sequential  # ignore error
-from tensorflow.keras.layers import Dense  # ignore error
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+import time
+import pandas as pd
+import aggr
 
-train_TE = res.TErrors[
-    (res.TErrors.index >= pd.to_datetime('2020-09-01')) & (res.TErrors.index <= pd.to_datetime('2022-12-31'))]
-test_TE = res.TErrors[
-    (res.TErrors.index >= pd.to_datetime('2023-01-01')) & (res.TErrors.index <= pd.to_datetime('2023-05-31'))]
+# train/test split
+train_TE = aggr.TE[(aggr.TE.index >= aggr.pd.to_datetime('2003-06-01')) & (aggr.TE.index <= pd.to_datetime('2019-05-31'))]
+test_TE = aggr.TE[(aggr.TE.index >= pd.to_datetime('2019-06-01')) & (aggr.TE.index <= pd.to_datetime('2023-05-31'))]
 epochs = 20
 predictors = ['NNLS', 'PCRR', 'DTW', 'NNMF']
 
@@ -30,6 +29,7 @@ print("-" * 100)
 print('Elapsed seconds per epoch: {:.5f}'.format((t2 - t1) / epochs))
 dl_model.summary()
 
+# present learning results
 replica_preds = pd.DataFrame()
 replica_preds['Ground_Truth'] = test_TE[['Replica']]
 replica_preds['ML_preds'] = pd.Series(ml_model.predict(test_TE[predictors]), index=test_TE.index)
