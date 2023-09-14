@@ -7,10 +7,20 @@ import pandas as pd
 import aggr
 
 # train/test split
-train_TE = aggr.TE[(aggr.TE.index >= aggr.pd.to_datetime('2003-06-01')) & (aggr.TE.index <= pd.to_datetime('2019-05-31'))]
+train_TE = aggr.TE[(aggr.TE.index >= pd.to_datetime('2003-06-01')) & (aggr.TE.index <= pd.to_datetime('2019-05-31'))]
 test_TE = aggr.TE[(aggr.TE.index >= pd.to_datetime('2019-06-01')) & (aggr.TE.index <= pd.to_datetime('2023-05-31'))]
 epochs = 20
-predictors = ['NNLS', 'PCRR', 'DTW', 'NNMF']
+
+# predictors = ['NNLS', 'PCRR']
+# predictors = ['NNLS','DTW']
+# predictors = ['NNLS','NNMF']
+# predictors = ['NNLS', 'PSO']
+# predictors = ['PCRR', 'DTW']
+# predictors = ['PCRR', 'NNMF']
+# predictors = ['PCRR', 'PSO']
+# predictors = ['DTW', 'NNMF']
+# predictors = ['DTW', 'PSO']
+predictors = ['NNMF', 'PSO']
 
 # ML modelling
 ml_model = RandomForestClassifier(n_estimators=100, min_samples_split=50, random_state=1)
@@ -18,8 +28,8 @@ ml_model.fit(train_TE[predictors], train_TE['Replica'])
 
 # DL modelling
 dl_model = Sequential()
-dl_model.add(Dense(16, input_shape=(4,), activation='relu'))
-dl_model.add(Dense(4, activation='relu'))
+dl_model.add(Dense(4, input_shape=(2,), activation='relu'))
+dl_model.add(Dense(2, activation='relu'))
 dl_model.add(Dense(1, activation='sigmoid'))
 dl_model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 t1 = time.time()
