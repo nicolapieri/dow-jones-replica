@@ -8,7 +8,7 @@ The official DJIA close is calculated by summing all the close prices of the sto
 
 I decided to base this work on the DJIA due to its vogue, but other market indexes would also work perfectly. Just like individual stocks, stock market indexes also produce a return (positive or negative) over time.
 
-# 3. Building the Portfolios
+# 2. Building the Portfolios
 
 To produce optimal portfolios, I used five well-known portfolio optimization algorithms using the DJIA's daily adjusted close price on Yahoo Finance in respect to its stock components. The time frame under consideration is from June 1, 2003 through May 31, 2023. To allow for splits and dividend payments, I utilized modified closing prices rather than ordinary closing prices. The methods employed are as follows.
 
@@ -24,7 +24,7 @@ Every proper portfolio optimization strategy has periodical (monthly or trimestr
 
 ![img.png](img.png)
 
-# 4. Training Phase
+# 3. Training Phase
 
 For each optimized portfolio, I calculated the tracking error ('TE', below) which is the absolute difference in real returns (in percentage points) between the portfolio replica and the DJIA index. The standard deviation of the discrepancies between the portfolio's and the DJIA's returns yields the TE. Because the purpose is to duplicate an index rather than outperform the market, I am only interested in portfolios with minimal TE in absolute terms.
 
@@ -32,7 +32,7 @@ The TE data was processed using machine learning and deep learning techniques. T
 
 Beginning with this, I constructed two learning models to forecast the Boolean variable, using the tracking errors of each of the five optimization procedures as predictors. I used a Random Forest classifier ('RFC', below) for the machine learning model and a very simple Multi Layer Perceptron ('MLP', below), with structure 4-2-1, for the deep learning model to make things as simple as possible.
 
-# 5. Results & Conclusions
+# 4. Results & Conclusions
 
 As follows there are the accuracy scores of both the machine learning and deep learning models grouped by couple of predictors.
 
