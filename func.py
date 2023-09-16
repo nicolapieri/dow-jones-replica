@@ -233,5 +233,4 @@ def test_opt(composition, change_date, start_date, end_date):
         Opt_2020_08_31['PSO'] = PSO_leverage * X.dot(list(PSO_weights.values()))
 
     else:
-        # noinspection PyStatementEffect
-        None
+        raise NotImplementedError("Not existing composition!")
