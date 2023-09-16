@@ -30,7 +30,7 @@ For each optimized portfolio, I calculated the tracking error ('TE', below) whic
 
 The TE data was processed using machine learning and deep learning techniques. The final objective is to train a model capable of generalizing the optimization approaches' combined findings. To examine the mean of the tracking errors day by day, I arbitrarily set a +/- 5 bps interval within which the replica may be regarded correct. To express this subsequent knowledge, I also constructed a Boolean variable.
 
-Beginning with this, I constructed two learning models to forecast the Boolean variable, using the tracking errors of each of the five optimization procedures as predictors. I used a Random Forest classifier ('RFC', below) for the machine learning model and a very simple Multi Layer Perceptron ('MLP', below), with structure 4-2-1, for the deep learning model to make things as simple as possible.
+Beginning with this, I constructed two learning models to forecast the Boolean variable, using the tracking errors of each couple of optimization methods as predictors. I used a Random Forest classifier ('RFC', below) for the machine learning model and a very simple Multi Layer Perceptron ('MLP', below), with structure 4-2-1, for the deep learning model to make things as simple as possible.
 
 # 4. Results & Conclusions
 
@@ -47,6 +47,6 @@ As follows there are the accuracy scores of both the machine learning and deep l
 *   DTW + PSO: `ml accuracy: 0.7275, dl accuracy: 0.7035`
 *   NNMF + PSO: `ml accuracy: 0.8717, dl accuracy: 0.8837`
 
-The PCRR and DTW portfolio optimization models yielded the best pair of predictors. It was able to generalize the information from the training set to more than 90% of the days in the test set.
+The PCRR and NNMF portfolio optimization models yielded the best pair of predictors. This predictor was able to generalize the daily goodness of the replica of the training set to more than 90% of the days in the test set.
 
 Overall, the predictors created by combining two optimization strategies proved to be fairly trustworthy. Their predictions on a completely fresh data set might be viewed as if they were made using data from all approaches. Even if three of the five optimization strategies were not actually applied to the new data. This would result in huge resource savings.
