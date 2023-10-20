@@ -14,9 +14,8 @@ from pyswarms.utils.search.grid_search import GridSearch
 from pyswarms.single.global_best import GlobalBestPSO
 
 
-# main function
 def test_opt(composition, change_date, start_date, end_date):
-    # creating adjusted closes dataframes
+    # creating adjusted closes dataframe
     stocks = pd.DataFrame()
     for ticker in composition:
         globals()[ticker] = pd.DataFrame(yf.download(ticker, start=start_date, end=end_date))
@@ -101,7 +100,6 @@ def test_opt(composition, change_date, start_date, end_date):
     PSO_allocation.set_index('Component', inplace=True)
     PSO_allocation.reset_index(inplace=True)
 
-    # creating optimization dataframes
     if change_date == '2003-01-27':
         global Opt_2003_01_27
         Opt_2003_01_27 = pd.DataFrame()
@@ -233,4 +231,20 @@ def test_opt(composition, change_date, start_date, end_date):
         Opt_2020_08_31['PSO'] = PSO_leverage * X.dot(list(PSO_weights.values()))
 
     else:
-        raise NotImplementedError("Not existing composition!")
+        None
+
+
+def choose_predictors():
+    print("Select a couple of optimizers as predictors (NNLS, PCRR, DTW, NNMF, PSO)")
+    choice_1 = str(input('Your first choice is: '))
+    choice_2 = str(input('Your second choice is: '))
+    if choice_1 and choice_2 in ['NNLS', 'PCRR', 'DTW', 'NNMF', 'PSO']:
+        if choice_1 != choice_2:
+            choices = [choice_1, choice_2]
+            return choices
+        else:
+            print("Cannot select same optimizers.")
+            return choose_predictors()
+    else:
+        print("Invalid input. Please try again.")
+        return choose_predictors()
