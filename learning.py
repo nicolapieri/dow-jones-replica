@@ -13,6 +13,7 @@ test_TE = processing.TE[(processing.TE.index >= pd.to_datetime('2019-06-01')) & 
 epochs = 20
 
 # choosing predictors
+print("-" * 100)
 predictors = functions.choose_predictors()
 
 # ML modelling
