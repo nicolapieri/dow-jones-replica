@@ -14,8 +14,6 @@ jobs:
           cache: 'pip'
       - name: installing requirements
         run: pip install -r requirements.txt
-      - name: run scripts
+      - name: run functions
         run: |
-          python functions.py &
-          PID="$( echo $! )"
-          sleep 30
+          python functions.py
