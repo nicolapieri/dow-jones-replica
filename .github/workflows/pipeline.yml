@@ -1,0 +1,12 @@
+name: CI/CD
+on: push
+
+jobs:
+  run-functions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: repository checkout
+        uses: actions/checkout@3.0.2
+      - name: installing dependencies
+        working-directory: dowjones-replica
+        run: pip install -r .\requirements.txt
