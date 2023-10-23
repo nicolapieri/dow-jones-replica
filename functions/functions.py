@@ -12,6 +12,9 @@ from sklearn.decomposition import NMF
 # PSO
 from pyswarms.utils.search.grid_search import GridSearch
 from pyswarms.single.global_best import GlobalBestPSO
+# personal packages
+from .. import processing
+from .. import learning
 
 
 def test_opt(composition, change_date, start_date, end_date):

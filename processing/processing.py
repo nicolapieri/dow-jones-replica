@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import functions
+import processing
+import learning
 
 # Dow Jones compositions over years
 compat_2003_01_27 = ["MMM", "KODK", "JNJ", "AA", "XOM", "JPM", "MO", "GE", "MCD", "AXP",
