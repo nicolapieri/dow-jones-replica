@@ -13,4 +13,4 @@ jobs:
           python-version: '3.9.12'
           cache: 'pip'
       - name: installing requirements
-        run: pip install -r .\requirements.txt
+        run: pip install -r requirements.txt
