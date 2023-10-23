@@ -80,7 +80,7 @@ def test_opt(composition, change_date, start_date, end_date):
                    options={'c1': [1.5, 2.5], 'c2': [1, 2], 'w': [0.4, 0.5]},
                    bounds=(len(X.columns) * [0],
                            len(X.columns) * [1]),
-                   iters=20)
+                   iters=5)
 
     best_cost, best_pos = g.search()  # Given a matrix of position options search for best position
 
@@ -90,7 +90,7 @@ def test_opt(composition, change_date, start_date, end_date):
                               bounds=(len(X.columns) * [0],
                                       len(X.columns) * [1]))
 
-    cost, pos = optimizer.optimize(train_swarm, iters=20)  # Given the best position option optimize the cost
+    cost, pos = optimizer.optimize(train_swarm, iters=5)  # Given the best position option optimize the cost
 
     PSO_leverage = sum(pos)
     PSO_weights = dict(zip(list(X.columns), list(pos / PSO_leverage)))
