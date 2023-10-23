@@ -17,6 +17,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Test with pytest
+        # can replace NNLS and PCRR with other optimizers (NNLS, PCRR, DTW, NNMF, PSO)
         run: |
           pip install pytest pytest-cov
           pytest -s dowjones-replica.py NNLS PCRR --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html

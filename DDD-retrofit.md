@@ -82,18 +82,12 @@
 
 # **Design** - Software Architecture description
 
-*   **Functions microservice**
-    *   this microservice concerns the abilitation of all the functions needed by the subsequent phases of the pipeline (except for the learning session to avoid circular import).
-
-*   **Processing microservice**
-    *   this microservice performs the first steps of the pipeline:
+*   **dowjones-replica microservice**
+    *   Because of circular import issues this services must control the pipeline as a one single step:
       * DJIA data ingestion
       * Portfolio generation
       * Computing tracking errors
       * Setting threshold
-
-*   **Learning microservice**
-    *   this microservice performs the lasts steps of the pipeline:
       * Choosing the predictors
       * Splitting dataset
       * Training models
