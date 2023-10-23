@@ -7,9 +7,10 @@ jobs:
     steps:
       - name: repository checkout
         uses: actions/checkout@v4.1.1
-      - name: installing requirements
+      - name: installing python
         uses: actions/setup-python@v4.7.1
         with:
           python-version: '3.9.12'
           cache: 'pip'
-        run: pip install -r requirements.txt
+      - name: installing requirements
+        run: pip install -r .\requirements.txt
