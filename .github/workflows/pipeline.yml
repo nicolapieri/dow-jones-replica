@@ -5,15 +5,16 @@ jobs:
   run-functions:
     runs-on: ubuntu-latest
     steps:
-      - name: repository checkout
+      - name: Repository checkout
         uses: actions/checkout@v4.1.1
-      - name: installing python
+      - name: Python setup
+        working-directory: functions
         uses: actions/setup-python@v4.7.1
         with:
           python-version: '3.9.12'
           cache: 'pip'
-      - name: installing requirements
+      - name: Installing requirements
+        working-directory: functions
         run: pip install -r requirements.txt
-      - name: run functions
-        run: |
-          python functions.py
+      - name: Run functions.py
+        run: python functions.py
