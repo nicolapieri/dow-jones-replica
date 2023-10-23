@@ -8,7 +8,6 @@ jobs:
       - name: Repository checkout
         uses: actions/checkout@v4.1.1
       - name: Python setup
-        working-directory: functions
         uses: actions/setup-python@v4.7.1
         with:
           python-version: '3.9.12'
