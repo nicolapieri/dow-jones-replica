@@ -20,3 +20,9 @@ jobs:
         run: |
           pip install pytest pytest-cov
           pytest -s dowjones-replica.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+  deployment:
+    needs:
+      - test-dowjones-replica
+    runs on: ubuntu-latest
+    steps:
+      - run: true
