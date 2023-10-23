@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 # NNLS
 from scipy.optimize import nnls
-# PCRR
+# PCRR (necessary for partial corr)
 import pingouin as pg
 # DTW
 from tslearn.metrics import dtw
