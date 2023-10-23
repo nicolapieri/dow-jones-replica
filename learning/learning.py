@@ -4,8 +4,11 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 import time
 import pandas as pd
-import processing
-import functions
+# personal packages
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from functions import functions
+from processing import processing
 
 # train-test split
 train_TE = processing.TE[(processing.TE.index >= pd.to_datetime('2003-06-01')) & (processing.TE.index <= pd.to_datetime('2019-05-31'))]

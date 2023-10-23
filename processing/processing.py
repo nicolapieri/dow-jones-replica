@@ -1,7 +1,10 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import processing
-import learning
+# personal packages
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+from functions import functions
+from learning import learning
 
 # Dow Jones compositions over years
 compat_2003_01_27 = ["MMM", "KODK", "JNJ", "AA", "XOM", "JPM", "MO", "GE", "MCD", "AXP",
