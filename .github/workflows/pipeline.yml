@@ -13,5 +13,9 @@ jobs:
           python-version: '3.9.12'
           cache: 'pip'
       - name: installing requirements
-        working-directory: dowjones-replica
         run: pip install -r requirements.txt
+      - name: run scripts
+        run: |
+          python functions.py &
+          PID="$( echo $! )"
+          sleep 30
