@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: repository checkout
-        uses: actions/checkout@4.1.1
+        uses: actions/checkout@v4.1.1
       - name: installing dependencies
         working-directory: dowjones-replica
         run: pip install -r .\requirements.txt
