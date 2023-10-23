@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-import sys
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import precision_score
 from tensorflow.keras.models import Sequential
@@ -354,8 +353,7 @@ epochs = 20
 
 # choosing predictors
 print("-" * 100)
-#predictors = choose_predictors()
-predictors = sys.argv[1:]
+predictors = choose_predictors()
 
 # ML modelling
 ml_model = RandomForestClassifier(n_estimators=100, min_samples_split=50, random_state=1)
