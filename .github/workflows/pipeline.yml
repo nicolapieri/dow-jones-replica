@@ -18,3 +18,19 @@ jobs:
       - name: Run functions.py
         working-directory: functions
         run: python functions.py
+  run-processing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository checkout
+        uses: actions/checkout@v4.1.1
+      - name: Python setup
+        uses: actions/setup-python@v4.7.1
+        with:
+          python-version: '3.9.12'
+          cache: 'pip'
+      - name: Installing requirements
+        working-directory: processing
+        run: pip install -r processing-requirements.txt
+      - name: Run processing.py
+        working-directory: processing
+        run: python processing.py
