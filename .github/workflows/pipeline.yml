@@ -16,4 +16,5 @@ jobs:
         working-directory: functions
         run: pip install -r functions-requirements.txt
       - name: Run functions.py
+        working-directory: functions
         run: python functions.py
