@@ -23,6 +23,6 @@ jobs:
   deployment:
     needs:
       - test-dowjones-replica
-    runs on: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - run: true
